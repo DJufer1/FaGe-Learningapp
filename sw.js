@@ -1,8 +1,8 @@
-// sw.js - Service Worker für das gesamte App-Portal
+// sw.js - Service Worker für das gesamte App-Portal (Version 3)
 
-const CACHE_NAME = 'fage-portal-v1'; // Neuer Name und Version 1 für das Portal
+const CACHE_NAME = 'fage-portal-v3'; // Version erhöht!
 
-// Die komplette "Einkaufsliste" für die Offline-Funktionalität
+// Die "Einkaufsliste" mit lokalen Pfaden
 const urlsToCache = [
   // Haupt-Portal
   './',
@@ -15,9 +15,6 @@ const urlsToCache = [
   './rechentrainer/rechentrainer.html',
   './rechentrainer/rechentrainer.css',
   './rechentrainer/rechentrainer.js',
-  // Die externen p5.js-Skripte müssen wir hier NICHT mehr cachen,
-  // da sie vom Rechentrainer-Modul selbst nicht mehr geladen werden.
-  // Wir müssten sie bei Bedarf in main.js laden.
 
   // Unter-App: BKU Imposter
   './bku-imposter/imposter.html',
@@ -26,7 +23,11 @@ const urlsToCache = [
 
   // Geteilte Assets
   './assets/icon-192.png',
-  './assets/icon-512.png'
+  './assets/icon-512.png',
+  
+  // NEU: Lokale Pfade zu den p5.js-Bibliotheken
+  './assets/libs/p5.js',
+  './assets/libs/p5.dom.js'
 ];
 
 // 1. Installation: Dateien im Cache speichern
@@ -61,13 +62,11 @@ self.addEventListener('activate', event => {
   return self.clients.claim();
 });
 
-// 3. Fetch: Anfragen abfangen und aus dem Cache bedienen (Offline-First-Strategie)
+// 3. Fetch: Anfragen abfangen und aus dem Cache bedienen
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Wenn die Anfrage im Cache gefunden wird, diese zurückgeben.
-        // Ansonsten die Anfrage an das Netzwerk weiterleiten.
         return response || fetch(event.request);
       })
   );
