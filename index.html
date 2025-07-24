@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1024">
+    <title>FaGe App Portal</title>
+    
+    <!-- Globale Schriftart -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#46178f">
+    
+    <!-- Haupt-Stylesheet für das Portal -->
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+
+    <!-- Container für das Haupt-Portal (Hub) -->
+    <div id="app-hub">
+        <header>
+            <h1>FaGe App Portal</h1>
+            <p class="subtitle">Deine Sammlung an nützlichen Werkzeugen für den Pflegealltag.</p>
+        </header>
+        
+        <main class="app-grid">
+            <!-- Kachel 1: Der Rechentrainer -->
+            <div class="app-card" data-app="rechentrainer">
+                <div class="icon">🧮</div>
+                <h2>Rechentrainer</h2>
+                <p>Übe wichtige Berechnungen: Medikamente, Infusionen, Sauerstoff und mehr.</p>
+            </div>
+
+            <!-- Kachel 2: BKU Imposter -->
+            <div class="app-card" data-app="bku-imposter">
+                <div class="icon">🕵️</div>
+                <h2>BKU Imposter</h2>
+                <p>Ein Tool zur Simulation und zum Üben von BKU-Szenarien.</p>
+            </div>
+
+            <!-- Hier können später weitere Kacheln hinzugefügt werden -->
+            <!-- 
+            <div class="app-card" data-app="quiz">
+                <div class="icon">❓</div>
+                <h2>Fachbegriffe-Quiz</h2>
+                <p>Teste dein Wissen über medizinische Fachbegriffe und Abkürzungen.</p>
+            </div>
+            -->
+        </main>
+    </div>
+
+    <!-- Container, in den die Unter-Apps geladen werden -->
+    <div id="app-container">
+        <!-- Der Inhalt der Unter-Apps wird hier dynamisch von main.js eingefügt -->
+    </div>
+    
+    <!-- Haupt-JavaScript für die Portal-Logik -->
+    <script src="main.js" defer></script>
+</body>
+</html>

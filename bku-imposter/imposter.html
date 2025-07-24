@@ -1,0 +1,94 @@
+<!-- bku-imposter/imposter.html -->
+<!-- Dies ist NUR der HTML-Inhalt aus dem <body> deiner ursprünglichen Datei -->
+
+<div id="game-container" class="bg-white p-6 sm:p-8 md:p-10 rounded-2xl shadow-2xl w-full max-w-md transition-all duration-500">
+
+    <div id="start-screen">
+        <div class="mx-auto mb-6 h-24 w-24 flex items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 shadow-lg">
+            <span class="text-5xl">🩺</span>
+        </div>
+        <h1 class="game-title text-4xl sm:text-5xl font-extrabold text-center mb-2 text-purple-700">Imposter</h1>
+        <p class="text-center text-slate-500 mb-8 text-xl sm:text-2xl font-medium">FaGe Edition</p>
+
+        <div class="mb-4">
+            <label for="semesterSelect" class="block text-base font-medium text-slate-700 mb-2">Semester auswählen:</label>
+            <select id="semesterSelect" class="kahoot-select w-full">
+                </select>
+        </div>
+
+        <div id="hk-select-container" class="mb-6 hidden">
+            <label for="hkSelect" class="block text-base font-medium text-slate-700 mb-2">Handlungskompetenz:</label>
+            <select id="hkSelect" class="kahoot-select w-full">
+                </select>
+        </div>
+
+        <button id="startGameBtn" class="kahoot-button kahoot-button-green w-full">Spiel Starten</button>
+    </div>
+
+    <div id="player-setup-screen" class="hidden">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-8 text-center text-purple-700">Spieler einrichten</h2>
+        <div class="mb-6">
+            <label for="playerCount" class="block text-base font-medium text-slate-700 mb-2">Anzahl Spieler:</label>
+            <select id="playerCount" class="kahoot-select w-full">
+                </select>
+        </div>
+        <div id="playerNameInputs" class="mb-6 space-y-4">
+            </div>
+        <div class="flex space-x-3">
+            <button id="backToStartBtn" class="kahoot-button kahoot-button-slate w-1/3">Zurück</button>
+            <button id="submitPlayersBtn" class="kahoot-button kahoot-button-green w-2/3">Weiter</button>
+        </div>
+    </div>
+
+    <div id="role-reveal-screen" class="hidden">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4 text-center text-purple-700">Rollen aufdecken</h2>
+        <p class="text-base text-slate-600 mb-8 text-center">Klicke auf deinen Namen, um deine Rolle zu sehen. Gib das Handy dann weiter.</p>
+        <div id="playerCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+            </div>
+        <button id="proceedToGameBtn" class="kahoot-button kahoot-button-green w-full hidden">Alle Rollen gesehen? Spiel starten!</button>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4 text-center text-purple-700">Das Spiel läuft!</h2>
+        <p id="startingPlayerText" class="text-xl text-center font-semibold text-slate-700 mb-6"></p>
+        
+        <div class="rules-container relative group mb-6 text-center">
+            <button class="bg-purple-100 text-purple-700 px-6 py-3 rounded-lg hover:bg-purple-200 text-base font-medium transition duration-150 focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+                Spielregeln
+            </button>
+            <div class="rules-tooltip absolute hidden group-hover:block bg-slate-800 text-white text-sm rounded-lg p-4 shadow-xl z-20 mt-2 left-1/2 transform -translate-x-1/2 w-[300px] text-left">
+                <h4 class="font-bold text-base mb-2">Kurzregeln:</h4>
+                <ul class="list-disc list-inside space-y-1">
+                    <li>Einer ist der Imposter (kennt den Begriff nicht).</li>
+                    <li>Die anderen kennen den geheimen Fachbegriff.</li>
+                    <li>Reihum einen Hinweis geben (1 Wort/kurze Phrase).</li>
+                    <li>Begriff NICHT direkt nennen!</li>
+                    <li>Crew gewinnt: Imposter wird entlarvt.</li>
+                    <li>Imposter gewinnt: Begriff wird erraten ODER Unschuldiger beschuldigt.</li>
+                    <li>Nach jeder Runde: Diskutieren & abstimmen.</li>
+                </ul>
+            </div>
+        </div>
+
+        <p class="text-slate-600 text-base mb-6 text-center">Viel Spaß beim Diskutieren, Kombinieren und Entlarven!</p>
+        
+        <button id="revealBtn" class="kahoot-button kahoot-button-yellow w-full mb-4">Auflösen</button>
+        
+        <div id="reveal-info" class="hidden my-6 p-6 bg-indigo-50 rounded-xl shadow text-center">
+            <h3 class="text-2xl font-semibold text-indigo-700 mb-3">Auflösung</h3>
+            <p id="imposterWasText" class="text-xl text-slate-700"></p>
+            <p id="wordWasText" class="text-xl text-slate-700 mt-2"></p>
+        </div>
+        
+        <div class="space-y-4"> <button id="replaySamePlayersBtn" class="kahoot-button kahoot-button-blue w-full hidden">Nochmal Spielen (Gleiche Spieler)</button>
+            <button id="newGameBtn" class="kahoot-button kahoot-button-purple w-full">Neues Spiel</button>
+        </div>
+    </div>
+
+    <div id="message-box" class="fixed top-5 left-5 right-5 bg-red-600 text-white p-4 rounded-lg shadow-xl hidden z-50 text-base text-center">
+        <p id="message-text"></p>
+    </div>
+</div>

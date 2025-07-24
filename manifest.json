@@ -1,0 +1,21 @@
+{
+  "name": "FaGe Learningapp",
+  "short_name": "FaGe Learningapp",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#46178f",
+  "theme_color": "#46178f",
+  "description": "Eine Sammlung von Lernapps für Fachpersonen Gesundheit.",
+  "icons": [
+    {
+      "src": "./assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
