@@ -103,26 +103,41 @@ header .subtitle {
     box-sizing: border-box;
 }
 
-/* Zurück-Button, der von JS hinzugefügt wird */
-.back-to-hub-button {
+.hub-close-button {
     position: fixed;
     top: 15px;
     left: 15px;
     z-index: 1000;
-    
-    background-color: rgba(0, 0, 0, 0.5);
+
+    /* Aussehen */
+    width: 45px;
+    height: 45px;
+    border-radius: 50%; /* Macht den Button rund */
+    background-color: rgba(229, 57, 53, 0.8); /* Roter, semi-transparenter Hintergrund */
     color: white;
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+
+    /* Inhalt (das "X") */
+    font-family: Arial, sans-serif;
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 42px; /* Vertikale Zentrierung des "X" */
+    text-align: center;
+
+    /* Verhalten */
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    transition: background-color 0.2s ease, transform 0.2s ease;
+    transition: all 0.2s ease;
+}
+
+.hub-close-button:hover {
+    background-color: rgba(211, 47, 47, 0.95); /* Etwas kräftiger bei Hover */
+    transform: scale(1.1);
+}
+
+.hub-close-button:active {
+    transform: scale(1.0);
+    opacity: 0.8;
 }
 
 .back-to-hub-button:hover {
