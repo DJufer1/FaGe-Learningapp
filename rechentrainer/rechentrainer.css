@@ -55,18 +55,19 @@
 }
 
 /* --- Basis-Styling --- */
-body {
-    font-family: var(--font-family);
-    font-size: var(--base-font-size);
-    padding: 25px;
-    background-color: var(--bg-color);
-    color: var(--text-on-bg);
+#rechentrainer-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 25px;
-    line-height: 1.6;
+
+    /* Stellt sicher, dass der Container Platz hat */
+    width: 100%;
+    padding: 25px;
     box-sizing: border-box;
+
+    /* Diese Zeile sorgt für die perfekte Zentrierung */
+    margin: auto;
 }
 
 html, body {
