@@ -1,6 +1,6 @@
 // sw.js - Service Worker für das gesamte App-Portal (Version 3)
 
-const CACHE_NAME = 'fage-portal-v7'; // Version erhöht!
+const CACHE_NAME = 'fage-portal-v8'; // Version erhöht!
 
 // Die "Einkaufsliste" mit lokalen Pfaden
 const urlsToCache = [
