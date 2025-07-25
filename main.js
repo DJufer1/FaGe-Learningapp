@@ -1,4 +1,5 @@
 // main.js - Die Logik für das App-Portal (Version 4 - Lädt lokale Skripte)
+let p5Instance = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     const hub = document.getElementById('app-hub');
