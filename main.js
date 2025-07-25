@@ -41,18 +41,11 @@ const appConfig = {
     });
 
 async function loadApp(appName) {
-    hub.classList.add('hidden');
-    appContainer.innerHTML = '<p style="text-align:center; color:white; font-size: 1.5em;">Lade App...</p>';
-    appContainer.classList.remove('hidden');
+    hub.classList.add('hidden');
+    appContainer.innerHTML = '<p style="text-align:center; font-size: 1.5em;">Lade App...</p>';
+    appContainer.classList.remove('hidden');
 
-    // HIER DIE ÄNDERUNG EINFÜGEN
-    if (appName === 'bku-imposter') {
-        // Fügt nur noch die speziellen Klassen für die vertikale Zentrierung hinzu
-        appContainer.classList.add('justify-center', 'min-h-screen');
-    }
-
-    const config = appConfig[appName];
-    //...
+    const config = appConfig[appName];
 
     try {
         const htmlPath = `${appName}/${config.html}`;
@@ -63,20 +56,12 @@ async function loadApp(appName) {
 
         loadCss(`${appName}/${config.css}`, `css-${appName}`);
 
-        // =============================================================
-        // NEU START: Lade alle Abhängigkeiten, bevor das App-Skript startet
-        // =============================================================
         if (config.dependencies && config.dependencies.length > 0) {
-            console.log(`Lade Abhängigkeiten für ${appName}...`);
             for (const depUrl of config.dependencies) {
-                // Wir geben jeder Abhängigkeit eine eindeutige ID, um sie später zu entfernen
-                const depId = `dep-${appName}-${depUrl.split('/').pop()}`; 
+                const depId = `dep-${appName}-${depUrl.split('/').pop()}`;
                 await loadScript(depUrl, depId);
             }
         }
-        // =============================================================
-        // NEU ENDE
-        // =============================================================
 
         await loadScript(`${appName}/${config.js}`, `js-${appName}`);
 
@@ -125,15 +110,9 @@ async function loadApp(appName) {
     }
 
 function closeApp() {
-    appContainer.innerHTML = '';
-    appContainer.classList.add('hidden');
-    
-    // HIER DIE ÄNDERUNG EINFÜGEN
-    appContainer.classList.remove('justify-center', 'min-h-screen');
-
-    hub.classList.remove('hidden');
-
-    //... Rest der Funktion
+    appContainer.innerHTML = '';
+    appContainer.classList.add('hidden');
+    hub.classList.remove('hidden');
 
     // CSS & Haupt-JS entfernen
     const dynamicCss = document.getElementById(`css-${currentApp}`);
