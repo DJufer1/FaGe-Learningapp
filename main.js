@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const appCards = document.querySelectorAll('.app-card');
 
     let currentApp = null; 
+    let currentAppInstance = null; // <-- NEUE ZEILE
 
 const appConfig = {
     'rechentrainer': {
@@ -41,7 +42,7 @@ const appConfig = {
     });
 
 async function loadApp(appName) {
-    document.body.classList.add('app-active'); // NEU: Aktiviert den App-Modus
+    document.body.classList.add('app-active');
     hub.classList.add('hidden');
     appContainer.classList.remove('hidden');
     appContainer.innerHTML = '<p style="text-align:center; font-size: 1.5em;">Lade App...</p>';
@@ -65,6 +66,12 @@ async function loadApp(appName) {
         }
 
         await loadScript(`${appName}/${config.js}`, `js-${appName}`);
+
+        // NEU: App-Instanz für Imposter erstellen und starten
+        if (appName === 'bku-imposter' && window.ImposterGame) {
+            currentAppInstance = new window.ImposterGame();
+            currentAppInstance.startNewGame();
+        }
 
         addCloseButton();
         currentApp = appName;
@@ -122,7 +129,7 @@ function closeApp() {
     appContainer.classList.add('hidden');
     hub.classList.remove('hidden');
 
-    // CSS & Haupt-JS entfernen... (dieser Teil bleibt gleich)
+    // ... (der Code zum Entfernen von CSS & JS bleibt gleich) ...
     const dynamicCss = document.getElementById(`css-${currentApp}`);
     if (dynamicCss) dynamicCss.remove();
     const dynamicJs = document.getElementById(`js-${currentApp}`);
@@ -136,10 +143,11 @@ function closeApp() {
         });
     }
 
-    // Sucht den Button anhand der ID und entfernt ihn.
     const closeButton = document.querySelector('#hub-close-button');
     if (closeButton) closeButton.remove();
 
+    // NEU: Alte App-Instanz sauber entfernen
+    currentAppInstance = null;
     currentApp = null;
 }
 });
