@@ -1,5 +1,4 @@
 // main.js - Die Logik für das App-Portal (Version 4 - Lädt lokale Skripte)
-let p5Instance = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     const hub = document.getElementById('app-hub');
@@ -68,10 +67,15 @@ async function loadApp(appName) {
 
         await loadScript(`${appName}/${config.js}`, `js-${appName}`);
 
-        // NEU: App-Instanz für Imposter erstellen und starten
+        // Startet die Imposter-App Instanz
         if (appName === 'bku-imposter' && window.ImposterGame) {
             currentAppInstance = new window.ImposterGame();
             currentAppInstance.startNewGame();
+        }
+
+        // NEU: Startet die Rechentrainer-Instanz (p5.js Sketch)
+        if (appName === 'rechentrainer' && typeof rechentrainerSketch === 'function') {
+            currentAppInstance = new p5(rechentrainerSketch, document.getElementById('rechentrainer-container'));
         }
 
         addCloseButton();
@@ -124,13 +128,23 @@ function addCloseButton() {
     document.body.appendChild(closeButton);
 }
 
+// ERSETZE DEINE BISHERIGE closeApp FUNKTION:
 function closeApp() {
+    // NEU: Robuste Methode zum Beenden der laufenden App-Instanz
+    if (currentAppInstance) {
+        // Prüft, ob die Instanz eine "remove"-Funktion hat (wie bei p5.js)
+        if (typeof currentAppInstance.remove === 'function') {
+            currentAppInstance.remove();
+        }
+        currentAppInstance = null; // Setzt die Instanz in jedem Fall zurück
+    }
+
     document.body.classList.remove('app-active');
     appContainer.innerHTML = '';
     appContainer.classList.add('hidden');
     hub.classList.remove('hidden');
 
-    // ... (der Code zum Entfernen von CSS & JS bleibt gleich) ...
+    // ... (der Rest des Codes zum Entfernen von CSS & JS bleibt gleich) ...
     const dynamicCss = document.getElementById(`css-${currentApp}`);
     if (dynamicCss) dynamicCss.remove();
     const dynamicJs = document.getElementById(`js-${currentApp}`);
@@ -147,8 +161,6 @@ function closeApp() {
     const closeButton = document.querySelector('#hub-close-button');
     if (closeButton) closeButton.remove();
 
-    // NEU: Alte App-Instanz sauber entfernen
-    currentAppInstance = null;
     currentApp = null;
 }
 });
