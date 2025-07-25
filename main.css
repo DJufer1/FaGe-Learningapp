@@ -108,26 +108,27 @@ header .subtitle {
     top: 15px;
     left: 15px;
     z-index: 1000;
-
-    /* Aussehen */
-    width: 45px;
-    height: 45px;
-    border-radius: 50%; /* Macht den Button rund */
-    background-color: rgba(229, 57, 53, 0.8); /* Roter, semi-transparenter Hintergrund */
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.7);
-    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-
+    
+    /* Aussehen mit !important, um alles zu überschreiben */
+    width: 45px !important;
+    height: 45px !important;
+    border-radius: 50% !important;
+    background-color: rgba(229, 57, 53, 0.8) !important;
+    background-image: none !important; /* Wichtig gegen Verläufe */
+    color: white !important;
+    border: 2px solid rgba(255, 255, 255, 0.7) !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3) !important;
+    
     /* Inhalt (das "X") */
-    font-family: Arial, sans-serif;
-    font-size: 22px;
-    font-weight: bold;
-    line-height: 42px; /* Vertikale Zentrierung des "X" */
-    text-align: center;
-
+    font-family: Arial, sans-serif !important;
+    font-size: 22px !important;
+    font-weight: bold !important;
+    line-height: 42px !important;
+    text-align: center !important;
+    
     /* Verhalten */
-    cursor: pointer;
-    transition: all 0.2s ease;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
 }
 
 #hub-close-button:hover {
