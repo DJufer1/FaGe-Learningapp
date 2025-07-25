@@ -118,6 +118,7 @@ header .subtitle {
     color: white !important;
     border: 2px solid rgba(255, 255, 255, 0.7) !important;
     box-shadow: 0 3px 10px rgba(0,0,0,0.3) !important;
+    opacity: 0.6
     
     /* Inhalt (das "X") */
     font-family: Arial, sans-serif !important;
@@ -133,7 +134,8 @@ header .subtitle {
 
 #hub-close-button:hover {
     background-color: rgba(211, 47, 47, 0.95); /* Etwas kräftiger bei Hover */
-    transform: scale(1.1);
+    transform: scale(1.1)
+    opacity: 1;
 }
 
 #hub-close-button:active {
