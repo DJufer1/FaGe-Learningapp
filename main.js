@@ -102,29 +102,28 @@ async function loadApp(appName) {
 
 // Ersetze die alte "addBackButton" Funktion komplett hiermit
 function addCloseButton() {
-    if (document.querySelector('.hub-close-button')) return;
+    // Sucht nach der ID. Verhindert doppeltes Hinzufügen.
+    if (document.querySelector('#hub-close-button')) return;
+    
     const closeButton = document.createElement('button');
-    closeButton.innerHTML = '&#x2715;'; // Das ist ein "X"-Symbol
-    closeButton.className = 'hub-close-button';
+    closeButton.innerHTML = '&#x2715;';
+    closeButton.id = 'hub-close-button'; // Wichtig: Setzt die ID statt der Klasse
     closeButton.title = 'App schliessen';
     closeButton.addEventListener('click', closeApp);
     document.body.appendChild(closeButton);
 }
 
 function closeApp() {
-    document.body.classList.remove('app-active'); // NEU: Deaktiviert den App-Modus
+    document.body.classList.remove('app-active');
     appContainer.innerHTML = '';
     appContainer.classList.add('hidden');
     hub.classList.remove('hidden');
 
-    // CSS & Haupt-JS entfernen
+    // CSS & Haupt-JS entfernen... (dieser Teil bleibt gleich)
     const dynamicCss = document.getElementById(`css-${currentApp}`);
     if (dynamicCss) dynamicCss.remove();
-
     const dynamicJs = document.getElementById(`js-${currentApp}`);
     if (dynamicJs) dynamicJs.remove();
-
-    // Abhängigkeiten der aktuellen App entfernen
     const config = appConfig[currentApp];
     if (config && config.dependencies) {
         config.dependencies.forEach(depUrl => {
@@ -134,8 +133,9 @@ function closeApp() {
         });
     }
 
-    const backButton = document.querySelector('.back-to-hub-button');
-    if (backButton) backButton.remove();
+    // Sucht den Button anhand der ID und entfernt ihn.
+    const closeButton = document.querySelector('#hub-close-button');
+    if (closeButton) closeButton.remove();
 
     currentApp = null;
 }
