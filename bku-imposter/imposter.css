@@ -119,3 +119,6 @@ select.kahoot-select:focus {
     box-shadow: 0 0 0 3px rgba(74, 0, 224, 0.3);
     outline: none;
 }
+input[type="text"] {
+    color: #2D3748; 
+}
