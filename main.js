@@ -45,6 +45,9 @@ async function loadApp(appName) {
     appContainer.innerHTML = '<p style="text-align:center; font-size: 1.5em;">Lade App...</p>';
     appContainer.classList.remove('hidden');
 
+    // NEU: Diese Zeile für die Zentrierung hinzufügen
+    appContainer.classList.add('justify-center', 'min-h-screen');
+
     const config = appConfig[appName];
 
     try {
@@ -112,6 +115,10 @@ async function loadApp(appName) {
 function closeApp() {
     appContainer.innerHTML = '';
     appContainer.classList.add('hidden');
+    
+    // NEU: Diese Zeile zum Entfernen der Zentrierung hinzufügen
+    appContainer.classList.remove('justify-center', 'min-h-screen');
+
     hub.classList.remove('hidden');
 
     // CSS & Haupt-JS entfernen
