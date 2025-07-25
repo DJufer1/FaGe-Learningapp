@@ -1,43 +1,35 @@
-// bku-imposter/imposter.js
-// Dies ist der Inhalt aus dem <script>-Tag deiner ursprünglichen Datei
+// bku-imposter/imposter.js - Version 3 (mit sauberem Event-Handling)
 
-// DOM Elements
-const screens = {
-    start: document.getElementById('start-screen'),
-    playerSetup: document.getElementById('player-setup-screen'),
-    roleReveal: document.getElementById('role-reveal-screen'),
-    game: document.getElementById('game-screen'),
-};
-const startGameBtn = document.getElementById('startGameBtn');
-const semesterSelect = document.getElementById('semesterSelect');
-const hkSelectContainer = document.getElementById('hk-select-container');
-const hkSelect = document.getElementById('hkSelect');
-const playerCountSelect = document.getElementById('playerCount');
-const playerNameInputsContainer = document.getElementById('playerNameInputs');
-const submitPlayersBtn = document.getElementById('submitPlayersBtn');
-const backToStartBtn = document.getElementById('backToStartBtn');
-const playerCardsContainer = document.getElementById('playerCardsContainer');
-const proceedToGameBtn = document.getElementById('proceedToGameBtn');
-const startingPlayerText = document.getElementById('startingPlayerText');
-const newGameBtn = document.getElementById('newGameBtn');
-const messageBox = document.getElementById('message-box');
-const messageText = document.getElementById('message-text');
-const revealBtn = document.getElementById('revealBtn');
-const revealInfoDiv = document.getElementById('reveal-info');
-const imposterWasText = document.getElementById('imposterWasText');
-const wordWasText = document.getElementById('wordWasText');
-const replaySamePlayersBtn = document.getElementById('replaySamePlayersBtn');
-
-// Game State
-let players = [];
-let playerNamesForReplay = [];
-let currentWord = { term: '', definition: '' };
-let imposterIndex = -1;
-let rolesRevealedCount = 0;
-let currentTermsList = [];
+function ImposterGame() {
+    // DOM Elements - Einmalig beim Erstellen des Objekts finden
+    this.screens = {
+        start: document.getElementById('start-screen'),
+        playerSetup: document.getElementById('player-setup-screen'),
+        roleReveal: document.getElementById('role-reveal-screen'),
+        game: document.getElementById('game-screen'),
+    };
+    this.startGameBtn = document.getElementById('startGameBtn');
+    this.semesterSelect = document.getElementById('semesterSelect');
+    this.hkSelectContainer = document.getElementById('hk-select-container');
+    this.hkSelect = document.getElementById('hkSelect');
+    this.playerCountSelect = document.getElementById('playerCount');
+    this.playerNameInputsContainer = document.getElementById('playerNameInputs');
+    this.submitPlayersBtn = document.getElementById('submitPlayersBtn');
+    this.backToStartBtn = document.getElementById('backToStartBtn');
+    this.playerCardsContainer = document.getElementById('playerCardsContainer');
+    this.proceedToGameBtn = document.getElementById('proceedToGameBtn');
+    this.startingPlayerText = document.getElementById('startingPlayerText');
+    this.newGameBtn = document.getElementById('newGameBtn');
+    this.messageBox = document.getElementById('message-box');
+    this.messageText = document.getElementById('message-text');
+    this.revealBtn = document.getElementById('revealBtn');
+    this.revealInfoDiv = document.getElementById('reveal-info');
+    this.imposterWasText = document.getElementById('imposterWasText');
+    this.wordWasText = document.getElementById('wordWasText');
+    this.replaySamePlayersBtn = document.getElementById('replaySamePlayersBtn');
 
 // Begriff-Datenbank
-        const termsBySemester = {
+   this.termsBySemester = {
     "Semester 1": {
         "HK A1: Umsetzung von Professionalität und Klientenzentrierung - Berufsperson": [
             { term: "Instruktion", definition: "Gezielte Anleitung und Unterweisung in pflegerischen Tätigkeiten." },
@@ -1237,311 +1229,232 @@ let currentTermsList = [];
 }
 };
 
-// JavaScript-Logik
-function showScreen(screenName) {
-    Object.values(screens).forEach(screen => screen.classList.add('hidden'));
-    if (screens[screenName]) {
-        screens[screenName].classList.remove('hidden');
-    }
-    if (screenName === 'game') {
-        revealInfoDiv.classList.add('hidden');
-        revealBtn.classList.remove('hidden');
-        replaySamePlayersBtn.classList.add('hidden');
-    }
+ // Binde alle Methoden an die `this`-Instanz
+    this.startNewGame = this.startNewGame.bind(this);
+    this.showScreen = this.showScreen.bind(this);
+    this.showMessage = this.showMessage.bind(this);
+    this.populateSemesterSelect = this.populateSemesterSelect.bind(this);
+    this.populateHkSelect = this.populateHkSelect.bind(this);
+    this.handleStartGame = this.handleStartGame.bind(this);
+    this.handleSubmitPlayers = this.handleSubmitPlayers.bind(this);
+    this.initializeGameWithCurrentPlayers = this.initializeGameWithCurrentPlayers.bind(this);
+    this.displayPlayerCards = this.displayPlayerCards.bind(this);
+    this.determineStartingPlayer = this.determineStartingPlayer.bind(this);
+    this.updatePlayerNameInputs = this.updatePlayerNameInputs.bind(this);
+    this.populatePlayerCountSelect = this.populatePlayerCountSelect.bind(this);
+    
+    // Event Listeners - Werden nur EINMALIG hier gesetzt
+    this.semesterSelect.addEventListener('change', (event) => this.populateHkSelect(event.target.value));
+    this.startGameBtn.addEventListener('click', this.handleStartGame);
+    this.backToStartBtn.addEventListener('click', () => this.showScreen('start'));
+    this.playerCountSelect.addEventListener('change', this.updatePlayerNameInputs);
+    this.submitPlayersBtn.addEventListener('click', this.handleSubmitPlayers);
+    this.proceedToGameBtn.addEventListener('click', () => {
+        this.showScreen('game');
+        this.determineStartingPlayer();
+    });
+    this.newGameBtn.addEventListener('click', this.startNewGame);
+    this.replaySamePlayersBtn.addEventListener('click', () => {
+        if (this.playerNamesForReplay.length > 0) {
+            this.showScreen('roleReveal');
+            this.initializeGameWithCurrentPlayers();
+            this.displayPlayerCards();
+        }
+    });
+    this.revealBtn.addEventListener('click', () => {
+        if (this.players.length > 0 && this.imposterIndex !== -1 && this.currentWord.term !== '') {
+            const imposterPlayer = this.players[this.imposterIndex];
+            this.imposterWasText.textContent = `Der Imposter war: ${imposterPlayer.name}`;
+            this.wordWasText.textContent = `Der Begriff war: ${this.currentWord.term}`;
+            this.revealInfoDiv.classList.remove('hidden');
+            this.revealBtn.classList.add('hidden');
+            this.replaySamePlayersBtn.classList.remove('hidden');
+        }
+    });
 }
 
-function showMessage(message, duration = 3000) {
-    messageText.textContent = message;
-    messageBox.classList.remove('hidden');
-    messageBox.classList.add('fade-in-out');
+// === Methoden des ImposterGame Objekts ===
+
+ImposterGame.prototype.startNewGame = function() {
+    // Setzt den Spielzustand komplett zurück
+    this.players = [];
+    this.playerNamesForReplay = [];
+    this.currentWord = { term: '', definition: '' };
+    this.imposterIndex = -1;
+    this.rolesRevealedCount = 0;
+    this.currentTermsList = [];
+    this.playerNameInputsContainer.innerHTML = '';
+    this.playerCardsContainer.innerHTML = '';
+    
+    // Setzt die UI zurück
+    this.populateSemesterSelect();
+    this.showScreen('start');
+};
+
+ImposterGame.prototype.showScreen = function(screenName) {
+    Object.values(this.screens).forEach(screen => screen.classList.add('hidden'));
+    if (this.screens[screenName]) {
+        this.screens[screenName].classList.remove('hidden');
+    }
+    if (screenName === 'game' || screenName === 'roleReveal') {
+        this.revealInfoDiv.classList.add('hidden');
+        this.revealBtn.classList.remove('hidden');
+        this.replaySamePlayersBtn.classList.add('hidden');
+    }
+     if (screenName === 'start') {
+        this.hkSelectContainer.classList.add('hidden');
+        this.hkSelect.innerHTML = '';
+    }
+};
+
+ImposterGame.prototype.showMessage = function(message, duration = 3000) {
+    this.messageText.textContent = message;
+    this.messageBox.classList.remove('hidden');
+    this.messageBox.classList.add('fade-in-out');
     setTimeout(() => {
-        messageBox.classList.add('hidden');
-        messageBox.classList.remove('fade-in-out');
+        this.messageBox.classList.add('hidden');
+        this.messageBox.classList.remove('fade-in-out');
     }, duration);
-}
+};
 
-function populateSemesterSelect() {
-    semesterSelect.innerHTML = '';
+ImposterGame.prototype.populateSemesterSelect = function() {
+    this.semesterSelect.innerHTML = '';
     const defaultOption = document.createElement('option');
     defaultOption.value = "Zufall";
     defaultOption.textContent = "Zufall (Alle Semester)";
-    semesterSelect.appendChild(defaultOption);
+    this.semesterSelect.appendChild(defaultOption);
 
-    Object.keys(termsBySemester).forEach(semesterKey => {
+    Object.keys(this.termsBySemester).forEach(semesterKey => {
         const option = document.createElement('option');
         option.value = semesterKey;
         option.textContent = semesterKey;
-        semesterSelect.appendChild(option);
+        this.semesterSelect.appendChild(option);
     });
-    populateHkSelect(semesterSelect.value);
-}
+    this.populateHkSelect(this.semesterSelect.value);
+};
 
-function populateHkSelect(selectedSemester) {
-    hkSelect.innerHTML = '';
-    if (selectedSemester === "Zufall" || !termsBySemester[selectedSemester]) {
-        hkSelectContainer.classList.add('hidden');
+ImposterGame.prototype.populateHkSelect = function(selectedSemester) {
+    this.hkSelect.innerHTML = '';
+    if (selectedSemester === "Zufall" || !this.termsBySemester[selectedSemester]) {
+        this.hkSelectContainer.classList.add('hidden');
         return;
     }
 
-    hkSelectContainer.classList.remove('hidden');
+    this.hkSelectContainer.classList.remove('hidden');
 
     const allHkOption = document.createElement('option');
     allHkOption.value = "Alle_HKs";
     allHkOption.textContent = "Alle HKs dieses Semesters";
-    hkSelect.appendChild(allHkOption);
+    this.hkSelect.appendChild(allHkOption);
 
-    const semesterData = termsBySemester[selectedSemester];
+    const semesterData = this.termsBySemester[selectedSemester];
     Object.keys(semesterData).forEach(hkKey => {
         const option = document.createElement('option');
         option.value = hkKey;
         option.textContent = hkKey;
-        hkSelect.appendChild(option);
+        this.hkSelect.appendChild(option);
     });
-}
+};
 
-semesterSelect.addEventListener('change', (event) => {
-    populateHkSelect(event.target.value);
-});
-
-startGameBtn.addEventListener('click', () => {
-    const selectedSemesterValue = semesterSelect.value;
-    const selectedHkValue = hkSelect.value;
-    currentTermsList = [];
+ImposterGame.prototype.handleStartGame = function() {
+    const selectedSemesterValue = this.semesterSelect.value;
+    const selectedHkValue = this.hkSelect.value;
+    this.currentTermsList = [];
 
     if (selectedSemesterValue === "Zufall") {
-        Object.values(termsBySemester).forEach(semesterHks => {
-            Object.values(semesterHks).forEach(hkTerms => {
-                currentTermsList.push(...hkTerms);
-            });
+        Object.values(this.termsBySemester).forEach(semesterHks => {
+            Object.values(semesterHks).forEach(hkTerms => this.currentTermsList.push(...hkTerms));
         });
-    } else if (termsBySemester[selectedSemesterValue]) {
-        const semesterHks = termsBySemester[selectedSemesterValue];
-        if (!hkSelectContainer.classList.contains('hidden') && selectedHkValue === "Alle_HKs") {
-             Object.values(semesterHks).forEach(hkTerms => {
-                currentTermsList.push(...hkTerms);
-            });
-        } else if (!hkSelectContainer.classList.contains('hidden') && semesterHks[selectedHkValue]) {
-            currentTermsList = [...semesterHks[selectedHkValue]];
-        } else { 
-             Object.values(semesterHks).forEach(hkTerms => {
-                currentTermsList.push(...hkTerms);
-            });
+    } else if (this.termsBySemester[selectedSemesterValue]) {
+        const semesterHks = this.termsBySemester[selectedSemesterValue];
+        if (selectedHkValue === "Alle_HKs" || !selectedHkValue) {
+             Object.values(semesterHks).forEach(hkTerms => this.currentTermsList.push(...hkTerms));
+        } else if (semesterHks[selectedHkValue]) {
+            this.currentTermsList = [...semesterHks[selectedHkValue]];
         }
     }
 
-    if (currentTermsList.length === 0) {
-        showMessage("Keine Begriffe für die Auswahl gefunden. Bitte die Begriffsliste im Code prüfen.");
+    if (this.currentTermsList.length === 0) {
+        this.showMessage("Keine Begriffe für die Auswahl gefunden.");
         return;
     }
-    playerNamesForReplay = [];
-    showScreen('playerSetup');
-    populatePlayerCountSelect();
-    updatePlayerNameInputs(); 
-});
+    
+    this.playerNamesForReplay = [];
+    this.showScreen('playerSetup');
+    this.populatePlayerCountSelect();
+    this.updatePlayerNameInputs();
+};
 
-backToStartBtn.addEventListener('click', () => {
-    showScreen('start');
-    hkSelectContainer.classList.add('hidden');
-    hkSelect.innerHTML = '';
-});
-
-playerCountSelect.addEventListener('change', updatePlayerNameInputs);
-
-submitPlayersBtn.addEventListener('click', () => {
-    const numPlayers = parseInt(playerCountSelect.value);
+ImposterGame.prototype.handleSubmitPlayers = function() {
+    const numPlayers = parseInt(this.playerCountSelect.value);
     const names = [];
-    let allNamesFilled = true;
     for (let i = 0; i < numPlayers; i++) {
         const input = document.getElementById(`playerName${i}`);
         if (input.value.trim() === '') {
-            allNamesFilled = false;
-            break;
+            this.showMessage("Bitte gib allen Spielern einen Namen.");
+            return;
         }
         names.push(input.value.trim());
     }
-
-    if (!allNamesFilled) {
-        showMessage("Bitte gib allen Spielern einen Namen.");
+    if (new Set(names).size !== names.length) {
+        this.showMessage("Spielernamen müssen eindeutig sein.");
         return;
     }
-    if (new Set(names).size !== names.length) {
-         showMessage("Spielernamen müssen eindeutig sein.");
-         return;
-    }
-    playerNamesForReplay = [...names];
-    initializeGameWithCurrentPlayers();
-    showScreen('roleReveal');
-    displayPlayerCards();
-});
-
-replaySamePlayersBtn.addEventListener('click', () => {
-    if (playerNamesForReplay.length > 0) {
-        revealInfoDiv.classList.add('hidden');
-        replaySamePlayersBtn.classList.add('hidden');
-        revealBtn.classList.remove('hidden');
-
-        initializeGameWithCurrentPlayers();
-        showScreen('roleReveal');
-        displayPlayerCards();
-    } else {
-        showMessage("Fehler: Keine Spielerdaten für 'Nochmal spielen' gefunden.");
-        resetGame();
-        showScreen('start');
-    }
-});
-
-proceedToGameBtn.addEventListener('click', () => {
-    showScreen('game');
-    determineStartingPlayer();
-});
-
-newGameBtn.addEventListener('click', () => {
-    resetGame();
-    showScreen('start');
-});
-
-revealBtn.addEventListener('click', () => {
-    if (players.length > 0 && imposterIndex !== -1 && currentWord.term !== '') {
-        const imposterPlayer = players[imposterIndex];
-        imposterWasText.textContent = `Der Imposter war: ${imposterPlayer.name}`;
-        wordWasText.textContent = `Der Begriff war: ${currentWord.term}`;
-        revealInfoDiv.classList.remove('hidden');
-        revealBtn.classList.add('hidden');
-        replaySamePlayersBtn.classList.remove('hidden');
-    } else {
-        showMessage("Spiel muss erst konfiguriert sein.");
-    }
-});
-
-function populatePlayerCountSelect() {
-    playerCountSelect.innerHTML = ''; 
-    for (let i = 2; i <= 8; i++) {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = `${i} Spieler`;
-        playerCountSelect.appendChild(option);
-    }
-    playerCountSelect.value = Math.min(8, Math.max(2, playerNamesForReplay.length > 0 ? playerNamesForReplay.length : 4)).toString();
-}
-
-function updatePlayerNameInputs() {
-    const numPlayers = parseInt(playerCountSelect.value);
-    playerNameInputsContainer.innerHTML = ''; 
-    for (let i = 0; i < numPlayers; i++) {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.id = `playerName${i}`;
-        input.value = playerNamesForReplay[i] || '';
-        input.placeholder = `Name Spieler ${i + 1}`;
-        input.className = 'w-full p-3 border border-slate-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500 text-lg';
-        playerNameInputsContainer.appendChild(input);
-    }
-}
-
-function initializeGameWithCurrentPlayers() {
-    players = []; 
-    if (currentTermsList.length === 0) {
-        const selectedSemesterValue = semesterSelect.value;
-        const selectedHkValue = hkSelect.value;
-        if (selectedSemesterValue === "Zufall") {
-            Object.values(termsBySemester).forEach(semesterHks => {
-                Object.values(semesterHks).forEach(hkTerms => currentTermsList.push(...hkTerms));
-            });
-        } else if (termsBySemester[selectedSemesterValue]) {
-            const semesterHks = termsBySemester[selectedSemesterValue];
-            if (!hkSelectContainer.classList.contains('hidden') && selectedHkValue === "Alle_HKs") {
-                Object.values(semesterHks).forEach(hkTerms => currentTermsList.push(...hkTerms));
-            } else if (!hkSelectContainer.classList.contains('hidden') && semesterHks[selectedHkValue]) {
-                currentTermsList = [...semesterHks[selectedHkValue]];
-            } else {
-                Object.values(semesterHks).forEach(hkTerms => currentTermsList.push(...hkTerms));
-            }
-        }
-        if (currentTermsList.length === 0) {
-             showMessage("Fehler: Keine Begriffe für die Auswahl gefunden.");
-             currentWord = { term: "FEHLER", definition: "Keine Begriffe geladen." };
-             resetGame();
-             showScreen('start');
-             return; 
-        }
-    }
     
-    currentWord = currentTermsList[Math.floor(Math.random() * currentTermsList.length)];
-    imposterIndex = Math.floor(Math.random() * playerNamesForReplay.length);
-    rolesRevealedCount = 0;
-    
-    proceedToGameBtn.classList.add('hidden'); 
-    revealInfoDiv.classList.add('hidden');
-    replaySamePlayersBtn.classList.add('hidden');
-    revealBtn.classList.remove('hidden'); 
+    this.playerNamesForReplay = [...names];
+    this.showScreen('roleReveal');
+    this.initializeGameWithCurrentPlayers();
+    this.displayPlayerCards();
+};
 
-    playerNamesForReplay.forEach((name, index) => {
-        players.push({
+ImposterGame.prototype.initializeGameWithCurrentPlayers = function() {
+    this.players = [];
+    this.currentWord = this.currentTermsList[Math.floor(Math.random() * this.currentTermsList.length)];
+    this.imposterIndex = Math.floor(Math.random() * this.playerNamesForReplay.length);
+    this.rolesRevealedCount = 0;
+    
+    this.proceedToGameBtn.classList.add('hidden');
+
+    this.playerNamesForReplay.forEach((name, index) => {
+        this.players.push({
             name: name,
-            isImposter: index === imposterIndex,
+            isImposter: index === this.imposterIndex,
             roleRevealed: false 
         });
     });
-}
+};
 
-function displayPlayerCards() {
-    playerCardsContainer.innerHTML = '';
-    players.forEach((player, index) => {
-        // Kartenhöhe für mobile Geräte optimiert
+ImposterGame.prototype.displayPlayerCards = function() {
+    this.playerCardsContainer.innerHTML = '';
+    this.players.forEach((player, index) => {
         const cardContainer = document.createElement('div');
-        cardContainer.className = 'card h-48'; // Etwas höhere Karte für bessere Bedienbarkeit
-
+        cardContainer.className = 'card h-48';
         const cardInner = document.createElement('div');
         cardInner.className = 'card-inner';
-
         const cardFront = document.createElement('div');
         cardFront.className = 'card-front flex flex-col justify-center items-center p-2';
         cardFront.innerHTML = `<span class="font-semibold text-xl">${player.name}</span><span class="text-sm mt-1">(Klicken zum Aufdecken)</span>`;
-
         const cardBack = document.createElement('div');
-        cardBack.className = 'card-back p-3 break-words flex flex-col justify-center items-center'; 
+        cardBack.className = 'card-back p-3 break-words flex flex-col justify-center items-center';
         
         if (player.isImposter) {
             cardBack.innerHTML = `<span class="font-bold text-2xl">IMPOSTER</span><p class="text-sm mt-1">Du kennst den Begriff nicht!</p>`;
         } else {
-            const termContainer = document.createElement('div');
-            termContainer.className = 'relative group text-center w-full px-1 flex flex-col items-center justify-center h-full';
-
-            const termText = document.createElement('span');
-            termText.className = 'font-semibold term-text-hyphenate text-xl'; // Größere Schriftgröße
-            termText.textContent = currentWord.term;
-            
-            termContainer.appendChild(termText);
-
-            const questionMarkContainer = document.createElement('div');
-            questionMarkContainer.className = 'mt-2';
-
-            const questionMark = document.createElement('span');
-            questionMark.className = 'text-lg cursor-help opacity-80'; // Größeres Fragezeichen
-            questionMark.textContent = '❓ Definition';
-            questionMarkContainer.appendChild(questionMark);
-            
-            const definitionBox = document.createElement('div');
-            definitionBox.className = 'definition-tooltip absolute hidden group-hover:block bg-slate-700 text-white text-sm rounded-lg p-3 shadow-xl whitespace-normal text-left';
-            definitionBox.textContent = currentWord.definition;
-            questionMarkContainer.appendChild(definitionBox);
-            
-            termContainer.appendChild(questionMarkContainer);
-            cardBack.appendChild(termContainer);
+            cardBack.innerHTML = `<span class="font-semibold text-xl">${this.currentWord.term}</span><div class="mt-2 text-lg opacity-80 cursor-help relative group">❓ Definition<div class="definition-tooltip absolute hidden group-hover:block bg-slate-700 text-white text-sm rounded-lg p-3 shadow-xl whitespace-normal text-left">${this.currentWord.definition}</div></div>`;
         }
         
         const understoodButton = document.createElement('button');
         understoodButton.textContent = "Verstanden";
         understoodButton.className = "absolute bottom-3 left-1/2 transform -translate-x-1/2 bg-white/25 hover:bg-white/40 text-white text-sm font-semibold py-2 px-4 rounded-lg";
         understoodButton.onclick = (e) => {
-            e.stopPropagation(); 
-            cardContainer.classList.remove('flipped'); 
+            e.stopPropagation();
+            cardContainer.classList.remove('flipped');
             cardFront.innerHTML = `<span class="font-semibold text-xl">${player.name}</span><span class="text-base text-green-200">✔️</span>`;
-            cardContainer.onclick = null; 
+            cardContainer.onclick = null;
             player.roleRevealed = true;
-            rolesRevealedCount++;
-            if (rolesRevealedCount === players.length) {
-                proceedToGameBtn.classList.remove('hidden');
+            this.rolesRevealedCount++;
+            if (this.rolesRevealedCount === this.players.length) {
+                this.proceedToGameBtn.classList.remove('hidden');
             }
         };
         cardBack.appendChild(understoodButton);
@@ -1555,46 +1468,45 @@ function displayPlayerCards() {
                 cardContainer.classList.add('flipped');
             }
         });
-        playerCardsContainer.appendChild(cardContainer);
+        this.playerCardsContainer.appendChild(cardContainer);
     });
-}
+};
 
-function determineStartingPlayer() {
-    let crewmates = players.filter(p => !p.isImposter);
-    if (crewmates.length === 0) { 
-        if (players.length > 0) { 
-             const startingPlayer = players[Math.floor(Math.random() * players.length)];
-             startingPlayerText.textContent = `${startingPlayer.name} beginnt!`;
-        } else {
-            startingPlayerText.textContent = "Fehler: Keine Spieler gefunden.";
-        }
-        return;
+ImposterGame.prototype.determineStartingPlayer = function() {
+    const crewmates = this.players.filter(p => !p.isImposter);
+    const startingPlayer = crewmates.length > 0
+        ? crewmates[Math.floor(Math.random() * crewmates.length)]
+        : this.players[Math.floor(Math.random() * this.players.length)];
+    this.startingPlayerText.textContent = `${startingPlayer.name} beginnt mit dem ersten Hinweis!`;
+};
+
+ImposterGame.prototype.populatePlayerCountSelect = function() {
+    this.playerCountSelect.innerHTML = '';
+    for (let i = 2; i <= 8; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `${i} Spieler`;
+        this.playerCountSelect.appendChild(option);
     }
-    const startingPlayer = crewmates[Math.floor(Math.random() * crewmates.length)];
-    startingPlayerText.textContent = `${startingPlayer.name} beginnt mit dem ersten Hinweis!`;
-}
+    this.playerCountSelect.value = Math.min(8, Math.max(2, this.playerNamesForReplay.length > 0 ? this.playerNamesForReplay.length : 4)).toString();
+};
 
-function resetGame() {
-    players = [];
-    playerNamesForReplay = [];
-    currentWord = { term: '', definition: '' };
-    imposterIndex = -1;
-    rolesRevealedCount = 0;
-    currentTermsList = [];
-    playerNameInputsContainer.innerHTML = '';
-    playerCardsContainer.innerHTML = '';
-    proceedToGameBtn.classList.add('hidden');
-    semesterSelect.value = "Zufall"; 
-    hkSelectContainer.classList.add('hidden');
-    hkSelect.innerHTML = '';
-    
-    revealInfoDiv.classList.add('hidden');
-    revealBtn.classList.remove('hidden'); 
-    replaySamePlayersBtn.classList.add('hidden'); 
-    imposterWasText.textContent = ''; 
-    wordWasText.textContent = '';    
-}
+ImposterGame.prototype.updatePlayerNameInputs = function() {
+    const numPlayers = parseInt(this.playerCountSelect.value);
+    this.playerNameInputsContainer.innerHTML = '';
+    for (let i = 0; i < numPlayers; i++) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = `playerName${i}`;
+        input.value = this.playerNamesForReplay[i] || '';
+        input.placeholder = `Name Spieler ${i + 1}`;
+        input.className = 'w-full p-3 border border-slate-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500 text-lg';
+        this.playerNameInputsContainer.appendChild(input);
+    }
+};
 
-// Initial Setup
-populateSemesterSelect();
-showScreen('start');
+// === STARTPUNKT ===
+// Erstelle eine neue Spiel-Instanz und starte sie.
+// Dieser Code wird jedes Mal ausgeführt, wenn imposter.js geladen wird.
+const currentGame = new ImposterGame();
+currentGame.startNewGame();
