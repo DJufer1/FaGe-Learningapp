@@ -1357,4 +1357,3 @@ function setupPwaInstall() {
         console.log('PWA was installed');
     });
 }
-// --- Ende sketch.js ---
