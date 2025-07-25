@@ -1508,5 +1508,4 @@ ImposterGame.prototype.updatePlayerNameInputs = function() {
 // === STARTPUNKT ===
 // Erstelle eine neue Spiel-Instanz und starte sie.
 // Dieser Code wird jedes Mal ausgeführt, wenn imposter.js geladen wird.
-const currentGame = new ImposterGame();
-currentGame.startNewGame();
+window.ImposterGame = ImposterGame;
