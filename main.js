@@ -41,11 +41,18 @@ const appConfig = {
     });
 
 async function loadApp(appName) {
-    hub.classList.add('hidden');
-    appContainer.innerHTML = '<p style="text-align:center; color:white; font-size: 1.5em;">Lade App...</p>';
-    appContainer.classList.remove('hidden');
+    hub.classList.add('hidden');
+    appContainer.innerHTML = '<p style="text-align:center; color:white; font-size: 1.5em;">Lade App...</p>';
+    appContainer.classList.remove('hidden');
 
-    const config = appConfig[appName];
+    // HIER DIE ÄNDERUNG EINFÜGEN
+    if (appName === 'bku-imposter') {
+        // Fügt nur noch die speziellen Klassen für die vertikale Zentrierung hinzu
+        appContainer.classList.add('justify-center', 'min-h-screen');
+    }
+
+    const config = appConfig[appName];
+    //...
 
     try {
         const htmlPath = `${appName}/${config.html}`;
@@ -118,9 +125,15 @@ async function loadApp(appName) {
     }
 
 function closeApp() {
-    appContainer.innerHTML = '';
-    appContainer.classList.add('hidden');
-    hub.classList.remove('hidden');
+    appContainer.innerHTML = '';
+    appContainer.classList.add('hidden');
+    
+    // HIER DIE ÄNDERUNG EINFÜGEN
+    appContainer.classList.remove('justify-center', 'min-h-screen');
+
+    hub.classList.remove('hidden');
+
+    //... Rest der Funktion
 
     // CSS & Haupt-JS entfernen
     const dynamicCss = document.getElementById(`css-${currentApp}`);
