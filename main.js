@@ -100,15 +100,16 @@ async function loadApp(appName) {
         document.head.appendChild(link);
     }
 
-    function addBackButton() {
-        if (document.querySelector('.back-to-hub-button')) return;
-        const backButton = document.createElement('button');
-        backButton.innerHTML = '&#x2190;';
-        backButton.className = 'back-to-hub-button';
-        backButton.title = 'Zurück zum Portal';
-        backButton.addEventListener('click', closeApp);
-        document.body.appendChild(backButton);
-    }
+// Ersetze die alte "addBackButton" Funktion komplett hiermit
+function addCloseButton() {
+    if (document.querySelector('.hub-close-button')) return;
+    const closeButton = document.createElement('button');
+    closeButton.innerHTML = '&#x2715;'; // Das ist ein "X"-Symbol
+    closeButton.className = 'hub-close-button';
+    closeButton.title = 'App schliessen';
+    closeButton.addEventListener('click', closeApp);
+    document.body.appendChild(closeButton);
+}
 
 function closeApp() {
     document.body.classList.remove('app-active'); // NEU: Deaktiviert den App-Modus
