@@ -129,3 +129,6 @@ header .subtitle {
     background-color: rgba(0, 0, 0, 0.7);
     transform: scale(1.1);
 }
+body.app-active #app-container {
+    min-height: 100vh;
+}
