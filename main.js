@@ -100,7 +100,6 @@ async function loadApp(appName) {
         document.head.appendChild(link);
     }
 
-// Ersetze die alte "addBackButton" Funktion komplett hiermit
 function addCloseButton() {
     // Sucht nach der ID. Verhindert doppeltes Hinzufügen.
     if (document.querySelector('#hub-close-button')) return;
@@ -109,6 +108,10 @@ function addCloseButton() {
     closeButton.innerHTML = '&#x2715;';
     closeButton.id = 'hub-close-button'; // Wichtig: Setzt die ID statt der Klasse
     closeButton.title = 'App schliessen';
+
+    // HIER IST DIE FEHLENDE ZEILE:
+    closeButton.style.borderRadius = '50%';
+
     closeButton.addEventListener('click', closeApp);
     document.body.appendChild(closeButton);
 }
