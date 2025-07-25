@@ -7,18 +7,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentApp = null; 
 
-    const appConfig = {
-        'rechentrainer': {
-            html: 'rechentrainer.html',
-            css: 'rechentrainer.css',
-            js: 'rechentrainer.js'
-        },
-        'bku-imposter': {
-            html: 'imposter.html',
-            css: 'imposter.css',
-            js: 'imposter.js'
-        }
-    };
+const appConfig = {
+    'rechentrainer': {
+        html: 'rechentrainer.html',
+        css: 'rechentrainer.css',
+        js: 'rechentrainer.js',
+        // NEU: Abhängigkeiten für p5.js
+        dependencies: [
+            './assets/libs/p5.js',
+            './assets/libs/p5.dom.js'
+        ]
+    },
+    'bku-imposter': {
+        html: 'imposter.html',
+        css: 'imposter.css',
+        js: 'imposter.js',
+        // NEU: Abhängigkeit für Tailwind CSS
+        dependencies: [
+            'https://cdn.tailwindcss.com'
+        ]
+    }
+};
 
     appCards.forEach(card => {
         card.addEventListener('click', () => {
@@ -31,39 +40,48 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    async function loadApp(appName) {
-        hub.classList.add('hidden');
-        appContainer.innerHTML = '<p style="text-align:center; color:white; font-size: 1.5em;">Lade App...</p>';
-        appContainer.classList.remove('hidden');
+async function loadApp(appName) {
+    hub.classList.add('hidden');
+    appContainer.innerHTML = '<p style="text-align:center; color:white; font-size: 1.5em;">Lade App...</p>';
+    appContainer.classList.remove('hidden');
 
-        const config = appConfig[appName];
+    const config = appConfig[appName];
 
-        try {
-            const htmlPath = `${appName}/${config.html}`;
-            const response = await fetch(htmlPath);
-            if (!response.ok) throw new Error(`HTML-Datei unter dem Pfad '${htmlPath}' nicht gefunden.`);
-            const appHtml = await response.text();
-            appContainer.innerHTML = appHtml;
+    try {
+        const htmlPath = `${appName}/${config.html}`;
+        const response = await fetch(htmlPath);
+        if (!response.ok) throw new Error(`HTML-Datei unter dem Pfad '${htmlPath}' nicht gefunden.`);
+        const appHtml = await response.text();
+        appContainer.innerHTML = appHtml;
 
-            loadCss(`${appName}/${config.css}`, `css-${appName}`);
+        loadCss(`${appName}/${config.css}`, `css-${appName}`);
 
-            // NEU: Lade p5.js aus dem lokalen Ordner
-            if (appName === 'rechentrainer') {
-                await loadScript('./assets/libs/p5.js', 'p5-main');
-                await loadScript('./assets/libs/p5.dom.js', 'p5-dom');
+        // =============================================================
+        // NEU START: Lade alle Abhängigkeiten, bevor das App-Skript startet
+        // =============================================================
+        if (config.dependencies && config.dependencies.length > 0) {
+            console.log(`Lade Abhängigkeiten für ${appName}...`);
+            for (const depUrl of config.dependencies) {
+                // Wir geben jeder Abhängigkeit eine eindeutige ID, um sie später zu entfernen
+                const depId = `dep-${appName}-${depUrl.split('/').pop()}`; 
+                await loadScript(depUrl, depId);
             }
-            
-            await loadScript(`${appName}/${config.js}`, `js-${appName}`);
-
-            addBackButton();
-            currentApp = appName;
-
-        } catch (error) {
-            console.error(error);
-            appContainer.innerHTML = `<p style="text-align:center; color:red; padding: 20px;"><b>Fehler:</b> Die App konnte nicht geladen werden.<br><small>${error.message}</small></p>`;
-            addBackButton();
         }
+        // =============================================================
+        // NEU ENDE
+        // =============================================================
+
+        await loadScript(`${appName}/${config.js}`, `js-${appName}`);
+
+        addBackButton();
+        currentApp = appName;
+
+    } catch (error) {
+        console.error(error);
+        appContainer.innerHTML = `<p style="text-align:center; color:red; padding: 20px;"><b>Fehler:</b> Die App konnte nicht geladen werden.<br><small>${error.message}</small></p>`;
+        addBackButton();
     }
+}
     
     function loadScript(src, id) {
         return new Promise((resolve, reject) => {
@@ -99,25 +117,31 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(backButton);
     }
 
-    function closeApp() {
-        appContainer.innerHTML = '';
-        appContainer.classList.add('hidden');
-        hub.classList.remove('hidden');
+function closeApp() {
+    appContainer.innerHTML = '';
+    appContainer.classList.add('hidden');
+    hub.classList.remove('hidden');
 
-        const dynamicElements = [
-            `css-${currentApp}`, 
-            `js-${currentApp}`, 
-            'p5-main', 
-            'p5-dom'
-        ];
-        dynamicElements.forEach(id => {
-            const el = document.getElementById(id);
+    // CSS & Haupt-JS entfernen
+    const dynamicCss = document.getElementById(`css-${currentApp}`);
+    if (dynamicCss) dynamicCss.remove();
+
+    const dynamicJs = document.getElementById(`js-${currentApp}`);
+    if (dynamicJs) dynamicJs.remove();
+
+    // Abhängigkeiten der aktuellen App entfernen
+    const config = appConfig[currentApp];
+    if (config && config.dependencies) {
+        config.dependencies.forEach(depUrl => {
+            const depId = `dep-${currentApp}-${depUrl.split('/').pop()}`;
+            const el = document.getElementById(depId);
             if (el) el.remove();
         });
-
-        const backButton = document.querySelector('.back-to-hub-button');
-        if (backButton) backButton.remove();
-        
-        currentApp = null;
     }
+
+    const backButton = document.querySelector('.back-to-hub-button');
+    if (backButton) backButton.remove();
+
+    currentApp = null;
+}
 });
