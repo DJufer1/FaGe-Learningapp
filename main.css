@@ -112,6 +112,7 @@ header .subtitle {
     /* Aussehen mit !important, um alles zu überschreiben */
     width: 45px !important;
     height: 45px !important;
+    padding: 0 !important;
     border-radius: 50% !important;
     background-color: rgba(229, 57, 53, 0.8) !important;
     background-image: none !important; /* Wichtig gegen Verläufe */
