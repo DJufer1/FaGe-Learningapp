@@ -41,12 +41,10 @@ const appConfig = {
     });
 
 async function loadApp(appName) {
+    document.body.classList.add('app-active'); // NEU: Aktiviert den App-Modus
     hub.classList.add('hidden');
-    appContainer.innerHTML = '<p style="text-align:center; font-size: 1.5em;">Lade App...</p>';
     appContainer.classList.remove('hidden');
-
-    // NEU: Diese Zeile für die Zentrierung hinzufügen
-    appContainer.classList.add('justify-center', 'min-h-screen');
+    appContainer.innerHTML = '<p style="text-align:center; font-size: 1.5em;">Lade App...</p>';
 
     const config = appConfig[appName];
 
@@ -113,12 +111,9 @@ async function loadApp(appName) {
     }
 
 function closeApp() {
+    document.body.classList.remove('app-active'); // NEU: Deaktiviert den App-Modus
     appContainer.innerHTML = '';
     appContainer.classList.add('hidden');
-    
-    // NEU: Diese Zeile zum Entfernen der Zentrierung hinzufügen
-    appContainer.classList.remove('justify-center', 'min-h-screen');
-
     hub.classList.remove('hidden');
 
     // CSS & Haupt-JS entfernen
