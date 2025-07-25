@@ -780,11 +780,14 @@ const rechenwegeErklaerungen = {
 // ==================
 
 function setup() {
-    fetchAllDOMElements();
-    attachStaticEventListeners();
-    setupPwaInstall();
-    navigateToState('menu');
-    console.log("App initialisiert. Status:", currentAppState);
+    // Gibt dem Browser einen Moment Zeit, um die HTML-Elemente vollständig zu laden
+    setTimeout(() => {
+        fetchAllDOMElements();
+        attachStaticEventListeners();
+        setupPwaInstall();
+        navigateToState('menu');
+        console.log("App initialisiert mit kleiner Verzögerung.");
+    }, 100); // 100ms Verzögerung
 }
 
 function draw() {
