@@ -103,7 +103,7 @@ header .subtitle {
     box-sizing: border-box;
 }
 
-.hub-close-button {
+#hub-close-button {
     position: fixed;
     top: 15px;
     left: 15px;
@@ -130,20 +130,16 @@ header .subtitle {
     transition: all 0.2s ease;
 }
 
-.hub-close-button:hover {
+#hub-close-button:hover {
     background-color: rgba(211, 47, 47, 0.95); /* Etwas kräftiger bei Hover */
     transform: scale(1.1);
 }
 
-.hub-close-button:active {
+#hub-close-button:active {
     transform: scale(1.0);
     opacity: 0.8;
 }
 
-.back-to-hub-button:hover {
-    background-color: rgba(0, 0, 0, 0.7);
-    transform: scale(1.1);
-}
 body.app-active #app-container {
     min-height: 100vh;
 }
