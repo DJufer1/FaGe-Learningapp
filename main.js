@@ -66,13 +66,13 @@ async function loadApp(appName) {
 
         await loadScript(`${appName}/${config.js}`, `js-${appName}`);
 
-        addBackButton();
+        addCloseButton();
         currentApp = appName;
 
     } catch (error) {
         console.error(error);
         appContainer.innerHTML = `<p style="text-align:center; color:red; padding: 20px;"><b>Fehler:</b> Die App konnte nicht geladen werden.<br><small>${error.message}</small></p>`;
-        addBackButton();
+        addCloseButton();
     }
 }
     
